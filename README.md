@@ -17,6 +17,26 @@ data-driven waste collection management.
 
 ---
 
+## Architecture
+
+```
+HC-SR501 (GPIO 17)
+      │
+      ▼
+ producer thread        ← sensing: reads sensor, interprets samples
+      │
+      ▼
+   Queue (in-memory)    ← buffering: decouples sensing from output
+      │
+      ▼
+ consumer thread        ← output: writes events to JSONL file
+      │
+      ▼
+ output/events.jsonl
+```
+
+---
+
 ## Project Structure
 
 ```
@@ -25,7 +45,8 @@ Smart-Wastebin/
 │   ├── __init__.py
 │   ├── sampler.py          # reads raw HIGH/LOW from the PIR sensor
 │   └── interpreter.py      # debounces samples into clean motion events
-├── pir_event_logger.py     # CLI: reads sensor, writes deposit events to JSONL
+├── pir_event_logger.py     # Milestone 2: single-loop event logger
+├── run_pipeline.py         # Milestone 3: modular producer/queue/consumer pipeline
 ├── .gitignore
 ├── README.md
 └── requirements.txt
@@ -75,15 +96,17 @@ pip install -r requirements.txt
 
 ---
 
-## Running the Event Logger
+## Running the Pipeline
 
 ```bash
-python pir_event_logger.py \
+python run_pipeline.py \
   --pin 17 \
   --sample-interval 0.1 \
-  --duration 60 \
-  --cooldown 3 \
+  --duration 86400 \
+  --cooldown 2.0 \
   --min-high 0.2 \
+  --queue-size 20 \
+  --consumer-delay 0.0 \
   --out output/events.jsonl \
   --device-id pir-01 \
   --verbose
@@ -96,14 +119,16 @@ python pir_event_logger.py \
 | `--duration` | Total run duration in seconds |
 | `--cooldown` | Minimum seconds between emitted events |
 | `--min-high` | Minimum HIGH duration before emitting an event |
+| `--queue-size` | Maximum events held in the internal queue |
+| `--consumer-delay` | Artificial delay between consumer iterations |
 | `--out` | Output JSONL file (append mode) |
 | `--device-id` | Unique identifier for this sensor |
-| `--verbose` | Print each event to the console |
+| `--verbose` | Print pipeline status to the console |
 
 ### Example output (`events.jsonl`)
 
 ```json
-{"event_time": "2026-04-24T10:15:30.512Z", "ingest_time": "2026-04-24T10:15:30.519Z", "device_id": "pir-01", "event_type": "motion_detected", "seq": 1, "run_id": "a1b2c3d4-...", "elapsed_s": 4.201, "latency_ms": 7.0}
+{"event_time": "2026-04-24T10:15:30.512Z", "device_id": "pir-01", "event_type": "motion", "motion_state": "detected", "seq": 1, "run_id": "a1b2c3d4-...", "ingest_time": "2026-04-24T10:15:30.519Z", "pipeline_latency_ms": 7.0}
 ```
 
 ---
@@ -113,5 +138,4 @@ python pir_event_logger.py \
 | Package | Version | Purpose |
 |---|---|---|
 | gpiozero | 2.0.1 | GPIO access |
-| signal | 1.4.0 | graceful process signal handling |
 | click | 8.1.8 | CLI argument parsing |
