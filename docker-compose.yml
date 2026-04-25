@@ -1,0 +1,34 @@
+services:
+  pir-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    privileged: true
+    devices:
+      - "/dev/gpiomem:/dev/gpiomem"
+      - "/dev/gpiochip0:/dev/gpiochip4"
+    volumes:
+      - pipeline-data:/data
+    command:
+      [
+        "python",
+        "run_pipeline.py",
+        "--pin", "17",
+        "--sample-interval", "0.1",
+        "--duration", "86400",
+        "--cooldown", "2.0",
+        "--min-high", "0.2",
+        "--queue-size", "20",
+        "--consumer-delay", "0.0",
+        "--out", "/data/events.jsonl",
+        "--device-id", "pir-01",
+        "--verbose"
+      ]
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+    restart: unless-stopped
+
+volumes:
+  pipeline-data:
