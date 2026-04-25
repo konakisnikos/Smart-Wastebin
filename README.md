@@ -29,10 +29,10 @@ HC-SR501 (GPIO 17)
    Queue (in-memory)    ← buffering: decouples sensing from output
       │
       ▼
- consumer thread        ← output: writes events to JSONL file
+ consumer thread        ← output: writes JSON-LD events to JSONL file
       │
       ▼
- output/events.jsonl
+ /data/events.jsonl
 ```
 
 ---
@@ -43,10 +43,19 @@ HC-SR501 (GPIO 17)
 Smart-Wastebin/
 ├── wastebinlib/
 │   ├── __init__.py
-│   ├── sampler.py          # reads raw HIGH/LOW from the PIR sensor
-│   └── interpreter.py      # debounces samples into clean motion events
-├── pir_event_logger.py     # Milestone 2: single-loop event logger
-├── run_pipeline.py         # Milestone 3: modular producer/queue/consumer pipeline
+│   ├── sampler.py              # reads raw HIGH/LOW from the PIR sensor
+│   └── interpreter.py          # debounces samples into clean motion events
+├── models/                     # Milestone 5: JSON-LD semantic models
+│   ├── context.jsonld          #   field → IRI mappings for pipeline events
+│   ├── sensor.jsonld           #   HC-SR501 sensor entity
+│   ├── wastebin.jsonld         #   smart bin entity
+│   └── environment.jsonld      #   deployment zone and spaces
+├── docs/
+│   └── ontology.md             # custom smartbin: namespace definitions
+├── pir_event_logger.py         # Milestone 2: single-loop event logger
+├── run_pipeline.py             # Milestone 3–5: modular pipeline, JSON-LD output
+├── Dockerfile                  # Milestone 4: container image
+├── docker-compose.yml          # Milestone 4: orchestrates the pipeline service
 ├── .gitignore
 ├── README.md
 └── requirements.txt
@@ -75,36 +84,42 @@ Smart-Wastebin/
 
 ---
 
-## Setup
-
-**Prerequisites:** Python 3.9 or newer, Git, Raspberry Pi with the sensor wired up.
+## Running with Docker (recommended)
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/konakisnikos/Smart-Wastebin.git
 cd Smart-Wastebin
 
-# 2. Create a virtual environment
-python3 -m venv venv
+docker compose up
+```
 
-# 3. Activate it
-source venv/bin/activate
+Events are written to a Docker volume (`pipeline-data`) and persist across restarts. To inspect them:
 
-# 4. Install dependencies
-pip install -r requirements.txt
+```bash
+docker exec smart-wastebin-pir-pipeline-1 tail -f /data/events.jsonl
+```
+
+To stop:
+
+```bash
+docker compose down
 ```
 
 ---
 
-## Running the Pipeline
+## Running manually (without Docker)
 
 ```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
 python run_pipeline.py \
   --pin 17 \
   --sample-interval 0.1 \
   --duration 86400 \
   --cooldown 2.0 \
-  --min-high 0.2 \
+  --min-high 0.3 \
   --queue-size 20 \
   --consumer-delay 0.0 \
   --out output/events.jsonl \
@@ -112,24 +127,40 @@ python run_pipeline.py \
   --verbose
 ```
 
-| Option | Description |
-|---|---|
-| `--pin` | BCM GPIO pin connected to the PIR sensor |
-| `--sample-interval` | Seconds between sensor reads |
-| `--duration` | Total run duration in seconds |
-| `--cooldown` | Minimum seconds between emitted events |
-| `--min-high` | Minimum HIGH duration before emitting an event |
-| `--queue-size` | Maximum events held in the internal queue |
-| `--consumer-delay` | Artificial delay between consumer iterations |
-| `--out` | Output JSONL file (append mode) |
-| `--device-id` | Unique identifier for this sensor |
-| `--verbose` | Print pipeline status to the console |
+---
 
-### Example output (`events.jsonl`)
+## Event Format
+
+Each line in `events.jsonl` is a self-describing JSON-LD observation:
 
 ```json
-{"event_time": "2026-04-24T10:15:30.512Z", "device_id": "pir-01", "event_type": "motion", "motion_state": "detected", "seq": 1, "run_id": "a1b2c3d4-...", "ingest_time": "2026-04-24T10:15:30.519Z", "pipeline_latency_ms": 7.0}
+{
+  "@context": "https://raw.githubusercontent.com/konakisnikos/Smart-Wastebin/main/models/context.jsonld",
+  "@type": "sosa:Observation",
+  "@id": "urn:dev:pir-sensor-smartbin:obs:<run_id>:<seq>",
+  "event_time": "2026-04-24T10:15:30.512Z",
+  "device_id": "pir-01",
+  "event_type": "motion",
+  "motion_state": "detected",
+  "seq": 1,
+  "run_id": "<uuid>",
+  "ingest_time": "2026-04-24T10:15:30.519Z",
+  "pipeline_latency_ms": 7.0
+}
 ```
+
+The `@context` maps each field to a globally understood IRI — `event_time` expands to `sosa:resultTime`, `seq` to `smartbin:sequenceNumber`, and so on. See [docs/ontology.md](docs/ontology.md) for the full custom namespace.
+
+---
+
+## Entity Models
+
+| File | Describes |
+|---|---|
+| [models/sensor.jsonld](models/sensor.jsonld) | HC-SR501 PIR sensor (`sosa:Sensor`) |
+| [models/wastebin.jsonld](models/wastebin.jsonld) | Smart waste bin (`sosa:FeatureOfInterest`) |
+| [models/environment.jsonld](models/environment.jsonld) | Deployment zone and spaces (`bot:Zone`, `bot:Space`) |
+| [models/context.jsonld](models/context.jsonld) | Shared `@context` for all pipeline events |
 
 ---
 
@@ -138,4 +169,5 @@ python run_pipeline.py \
 | Package | Version | Purpose |
 |---|---|---|
 | gpiozero | 2.0.1 | GPIO access |
+| rpi-lgpio | 0.6 | lgpio backend required inside the Docker container |
 | click | 8.1.8 | CLI argument parsing |

@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/",
+    "sosa":     "http://www.w3.org/ns/sosa/",
+    "smartbin": "https://github.com/konakisnikos/Smart-Wastebin/blob/main/docs/ontology.md#"
+  },
+  "@id": "urn:dev:bin-01",
+  "@type": ["sosa:FeatureOfInterest", "Thing"],
+  "name": "Smart Waste Bin 01",
+  "description": "A smart waste bin equipped with a PIR motion sensor to detect deposits and monitor usage.",
+  "material": "Plastic",
+  "color": "Grey",
+  "smartbin:maximumCapacity": 380,
+  "sosa:hosts":  { "@id": "urn:dev:pir-sensor-smartbin" },
+  "locatedIn":   { "@id": "urn:smartbin-deployment-zone" }
+}

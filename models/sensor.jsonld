@@ -1,0 +1,21 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/",
+    "sosa":     "http://www.w3.org/ns/sosa/",
+    "ssn":      "http://www.w3.org/ns/ssn/",
+    "smartbin": "https://github.com/konakisnikos/Smart-Wastebin/blob/main/docs/ontology.md#"
+  },
+  "@id": "urn:dev:pir-sensor-smartbin",
+  "@type": ["sosa:Sensor", "Thing"],
+  "name": "Smart Wastebin Motion Sensor",
+  "description": "HC-SR501 passive infrared motion sensor detecting movement near the smart wastebin",
+  "status": "active",
+  "sosa:observes": "Motion",
+  "iotlab11:gpioPin": 17,
+  "smartbin:gpioPin": 17,
+  "smartbin:sensingPrinciple": "Passive Infrared",
+  "smartbin:detectionRangeMetres": 7,
+  "voltage": "5V DC",
+  "mountedOn":   { "@id": "urn:dev:bin-01" },
+  "deployedIn":  { "@id": "urn:smartbin-deployment-zone" }
+}

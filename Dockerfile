@@ -5,7 +5,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY wastebinlib ./wastebinlib
+COPY wastebinlib    ./wastebinlib
+COPY models         ./models
 COPY run_pipeline.py .
 
 CMD ["python" , "run_pipeline.py"]

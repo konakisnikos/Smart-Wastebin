@@ -1,0 +1,31 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/",
+    "bot": "https://w3id.org/bot#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:smartbin-deployment-zone",
+      "@type": "bot:Zone",
+      "name": "Smart Wastebin Deployment Zone",
+      "description": "Zone covering all locations where smart wastebins are deployed.",
+      "bot:hasSpace": [
+        { "@id": "urn:kipes-lab" },
+        { "@id": "urn:home" }
+      ],
+      "bot:containsElement": { "@id": "urn:dev:bin-01" }
+    },
+    {
+      "@id": "urn:kipes-lab",
+      "@type": "bot:Space",
+      "name": "Ergasthrio Kypes",
+      "description": "University IoT lab where the smart wastebin is deployed for testing."
+    },
+    {
+      "@id": "urn:home",
+      "@type": "bot:Space",
+      "name": "Spiti",
+      "description": "Home environment where the smart wastebin is deployed for real-world use."
+    }
+  ]
+}

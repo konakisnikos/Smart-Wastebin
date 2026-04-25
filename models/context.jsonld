@@ -1,0 +1,16 @@
+{
+  "@context": {
+    "sosa":     "http://www.w3.org/ns/sosa/",
+    "xsd":      "http://www.w3.org/2001/XMLSchema#",
+    "smartbin": "https://github.com/konakisnikos/Smart-Wastebin/blob/main/docs/ontology.md#",
+
+    "event_time":          { "@id": "sosa:resultTime",             "@type": "xsd:dateTime" },
+    "ingest_time":         { "@id": "smartbin:ingestTime",         "@type": "xsd:dateTime" },
+    "device_id":           { "@id": "smartbin:deviceId"                                    },
+    "event_type":          { "@id": "smartbin:eventType"                                   },
+    "seq":                 { "@id": "smartbin:sequenceNumber",     "@type": "xsd:integer"  },
+    "run_id":              { "@id": "smartbin:runId"                                       },
+    "pipeline_latency_ms": { "@id": "smartbin:pipelineLatencyMs", "@type": "xsd:float"    },
+    "motion_state":        { "@id": "smartbin:motionState"                                 }
+  }
+}
