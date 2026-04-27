@@ -11,7 +11,6 @@
   "description": "HC-SR501 passive infrared motion sensor detecting movement near the smart wastebin",
   "status": "active",
   "sosa:observes": "Motion",
-  "iotlab11:gpioPin": 17,
   "smartbin:gpioPin": 17,
   "smartbin:sensingPrinciple": "Passive Infrared",
   "smartbin:detectionRangeMetres": 7,
