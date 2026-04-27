@@ -91,51 +91,93 @@ This project is meant to run on a Raspberry Pi with the HC-SR501 sensor wired
 to GPIO 17. The simplest path is: SSH into the Pi, clone the repo, and start
 the Docker Compose service there.
 
-### 1. Connect to the Pi
+### Step 1 — Connect to the Raspberry Pi via SSH
+
+From your host machine's terminal, run:
 
 ```bash
-ssh <username>@<pi-ip-address>
+ssh <username>@<PI_IP_ADDRESS>
 ```
 
-If SSH is not enabled on the Pi, turn it on first from Raspberry Pi OS settings
-or with `sudo raspi-config`. Useful checks once connected:
+
+- If this is your first time connecting, type `yes` when prompted
+- Enter your password when prompted. (Enter the password you set during the OS installation. If you did not do the installation try "admin")
+
+**Expected result:** You see the Pi's terminal prompt, e.g.:
+
+```
+<username>@<hostname>:~ $
+```
+
+
+### 2. Clone the repository
+
+First, verify that Git is installed:
 
 ```bash
-hostname -I
-whoami
-pwd
+git --version
 ```
 
-### 2. Prepare the Pi
-
-Install Git and Docker if they are missing:
+If the command is not found, install Git:
 
 ```bash
-sudo apt update
-sudo apt install -y git docker.io docker-compose-plugin
-sudo usermod -aG docker $USER
+sudo apt install -y git
 ```
 
-Log out and back in so the Docker group change takes effect.
-
-### 3. Get the code
+Then clone the repository:
 
 ```bash
 git clone https://github.com/konakisnikos/Smart-Wastebin.git
-cd Smart-Wastebin
 ```
 
-If the repo already exists:
+Navigate into the cloned folder:
 
 ```bash
 cd Smart-Wastebin
-git pull
 ```
+
+**Expected result:** The repository is downloaded and you are inside the project root directory.
+
+> **Note:** It is recommended to clone the repository into the user's home directory (`/home/iotlab_upat_11/`) as it ensures the user has full read/write permissions without needing `sudo` for every file operation.
 
 ### 4. Start with Docker
 
 ```bash
-docker compose up --build
+docker --version
+docker compose version
+```
+
+**Expected result:** Both commands print version information.
+
+If either command returns `command not found`, install Docker with the official convenience script:
+
+```bash
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+```
+
+Then log out and log back in so the new group membership takes effect, and verify the installation with:
+
+```bash
+groups
+docker run hello-world
+docker compose version
+```
+
+**Expected result after installation:** `docker` appears in the output of `groups`, `hello-world` runs successfully, and Docker Compose prints its version.
+
+Start the pipeline service:
+
+Since it is your first time running the pipeline, you need to build the Docker image first:
+
+```bash
+docker compose build
+```
+
+Then start the service:
+
+```bash
+docker compose up -d
 ```
 
 The pipeline writes JSONL events to `/data/events.jsonl` inside the container
@@ -168,10 +210,10 @@ pip install -r requirements.txt
 
 python run_pipeline.py \
      --pin 17 \
-     --sample-interval 0.1 \
+     --sample-interval 0.04 \
      --duration 86400 \
      --cooldown 2.0 \
-     --min-high 0.3 \
+     --min-high 0.1 \
      --queue-size 20 \
      --consumer-delay 0.0 \
      --out output/events.jsonl \
@@ -181,7 +223,6 @@ python run_pipeline.py \
 
 ### 7. Quick checks
 
-- `docker: command not found` means Docker is not installed or not in PATH.
 - `permission denied while trying to connect to the Docker daemon` usually
      means the current user is not in the `docker` group yet.
 - If GPIO access fails, confirm the sensor is wired to GPIO 17 and the Pi is

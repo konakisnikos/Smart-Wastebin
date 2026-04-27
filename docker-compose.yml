@@ -14,7 +14,7 @@ services:
         "python",
         "run_pipeline.py",
         "--pin", "17",
-        "--sample-interval", "0.1",
+        "--sample-interval", "0.04",
         "--duration", "86400",
         "--cooldown", "2.0",
         "--min-high", "0.1",
