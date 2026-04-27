@@ -96,7 +96,7 @@ def consumer_loop(
     with open(out_path, "a", encoding="utf-8") as f:
         while not stop_flag["stop"] or not event_q.empty():
             try:
-                record = event_q.get(timeout=0.5)
+                record = event_q.get(timeout=3.0)
             except Empty:
                 continue
 

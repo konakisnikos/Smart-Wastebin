@@ -17,7 +17,7 @@ services:
         "--sample-interval", "0.1",
         "--duration", "86400",
         "--cooldown", "2.0",
-        "--min-high", "0.2",
+        "--min-high", "0.1",
         "--queue-size", "20",
         "--consumer-delay", "0.0",
         "--out", "/data/events.jsonl",
