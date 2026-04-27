@@ -17,26 +17,6 @@ data-driven waste collection management.
 
 ---
 
-## Architecture
-
-```
-HC-SR501 (GPIO 17)
-      │
-      ▼
- producer thread        ← sensing: reads sensor, interprets samples
-      │
-      ▼
-   Queue (in-memory)    ← buffering: decouples sensing from output
-      │
-      ▼
- consumer thread        ← output: writes JSON-LD events to JSONL file
-      │
-      ▼
- /data/events.jsonl
-```
-
----
-
 ## Project Structure
 
 ```
@@ -62,6 +42,27 @@ Smart-Wastebin/
 ```
 
 ---
+
+## Architecture
+
+```
+HC-SR501 (GPIO 17)
+      │
+      ▼
+ producer thread        ← sensing: reads sensor, interprets samples
+      │
+      ▼
+   Queue (in-memory)    ← buffering: decouples sensing from output
+      │
+      ▼
+ consumer thread        ← output: writes JSON-LD events to JSONL file
+      │
+      ▼
+ /data/events.jsonl
+```
+
+---
+
 
 ## Hardware
 
