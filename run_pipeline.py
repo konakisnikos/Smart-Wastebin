@@ -96,7 +96,7 @@ def consumer_loop(
     with open(out_path, "a", encoding="utf-8") as f:
         while not stop_flag["stop"] or not event_q.empty():
             try:
-                record = event_q.get(timeout=3.0)
+                record = event_q.get(timeout=0.5)
             except Empty:
                 continue
 
@@ -192,7 +192,7 @@ def main(pin, sample_interval, duration, cooldown, min_high, queue_size, consume
                     f"dropped={metrics['dropped']} "
                     f"qsize={event_q.qsize()}"
                 )
-            time.sleep(1.0)
+            time.sleep(3.0)
     except KeyboardInterrupt:
         if verbose:
             click.echo("\n[pipeline] interrupted.")
