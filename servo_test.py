@@ -3,7 +3,7 @@ import time
 
 # Αρχικοποίηση του Servo στο GPIO 18.
 # Σύρμα 5V → Pin 2, Σύρμα GND → Pin 6, Σύρμα σήμα → GPIO 18
-servo = AngularServo(18, min_angle=-90, max_angle=90, min_pulse_width=0.0005, max_pulse_width=0.0024)
+servo = AngularServo(22, min_angle=-90, max_angle=90, min_pulse_width=0.0005, max_pulse_width=0.0024)
 
 print("Ξεκινάει το τεστ του Servo... Πάτα Ctrl+C για διακοπή.")
 print("Εντολές:")
