@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+*.log
+.env
+*.pdf
+*.zip
+
+# OS / editor junk
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes

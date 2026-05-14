@@ -192,7 +192,7 @@ def main(pin, sample_interval, duration, cooldown, min_high, queue_size, consume
                     f"dropped={metrics['dropped']} "
                     f"qsize={event_q.qsize()}"
                 )
-            time.sleep(1.0)
+            time.sleep(3.0)
     except KeyboardInterrupt:
         if verbose:
             click.echo("\n[pipeline] interrupted.")
